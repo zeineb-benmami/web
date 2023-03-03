@@ -9,6 +9,8 @@ use App\Repository\StudentRepository;
 use App\Entity\Student;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Form\StudentType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\Request;
 
 class StudentController extends AbstractController
 {
@@ -51,15 +53,55 @@ class StudentController extends AbstractController
 
 
     #[Route('/addstudent', name: 'addstudent')]
-    public function addstudent(ManagerRegistry $mr): Response
+    public function addstudent(ManagerRegistry $mr, Request $req): Response
     {
         $a=new Student();
         //$a->setEmail('zzzzzz');
         $f=$this->createForm(StudentType::class,$a);
+        $f->handleRequest($req);
+        if($f->isSubmitted()){
         $em=$mr->getManager();
         $em->persist($a) ;
         $em->flush();
-        return new Response('added');
+        return $this->redirectToRoute('getstudent');
+        }
+        //return new Response('added');
+        return $this->render('student/ls.html.twig', [
+            'formstudent'=>$f->createView()
+            
+        ]);
+    }
+
+
+    #[Route('/updatestudent/{id}', name: 'updatestudent')]
+    public function updateStudent(ManagerRegistry $mr, Request $req , $id): Response
+    {
+        $a=$mr->getRepository(Student::class)->find($id);
+        
+        $f=$this->createForm(StudentType::class,$a);
+        $f->handleRequest($req);
+
+        if($f->isSubmitted()){
+
+            $ref=$mr->getRepository(Student::class)->find($a->getNSC());
+            dd($ref);
+            $email=$a->getEmail();
+            $a->setEmail($email);
+            if($ref==null){
+        $em=$mr->getManager();
+        $em->persist($a) ;
+        $em->flush();
+            }
+            else{
+                return new Response ('ref existe!');
+            }
+        return $this->redirectToRoute('getstudent');
+        }
+        //return new Response('added');
+        return $this->render('student/ls.html.twig', [
+            'formstudent'=>$f->createView()
+            
+        ]);
     }
 
 }

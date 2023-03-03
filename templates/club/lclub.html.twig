@@ -7,7 +7,9 @@
        
         <td>{{a.REF}}</td>
         <td>{{a.createdAt|date('d/m/Y')}}</td>
-       
+       <td><a href="{{path('remove3',{'id':a.REF})}}">remove </a> </td>
+       <td><a href="{{path('addclub')}}">Add </a> </td>
+        <td><a href="{{path('updateclub',{'id':a.REF})}}">Update </a> </td>
       
 
 

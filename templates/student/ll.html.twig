@@ -7,14 +7,11 @@
        
         <td>{{a.NSC}}</td>
         <td>{{a.email}}</td>
-       
-      
+      <td><a href="{{path('remove2',{'id':a.NSC})}}">remove </a> </td>
+       <td><a href="{{path('addstudent')}}">Add </a> </td>
+        <td><a href="{{path('updatestudent',{'id':a.NSC})}}">Update </a> </td>
+      </td>
 
 
-      
-          
-        </td>
-
-
-    </tr>    {% endfor %}
+    </tr>   {% endfor %}
     </table>

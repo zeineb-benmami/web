@@ -8,6 +8,9 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\ClassroomRepository;
 use App\Entity\Classroom;
 use Doctrine\Persistence\ManagerRegistry ;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpFoundation\Request;
+use App\Form\ClassroomType;
 
 class ClassroomController extends AbstractController
 {
@@ -41,5 +44,60 @@ class ClassroomController extends AbstractController
             return new Response('removed');
             
        
+    }
+
+
+
+    
+    #[Route('/addclass', name: 'addclass')]
+    public function addclub(ManagerRegistry $mr, Request $req): Response
+    {
+        $a=new Classroom();
+       
+        $f=$this->createForm(ClassroomType::class,$a);
+        $f->handleRequest($req);
+        if($f->isSubmitted()){
+        $em=$mr->getManager();
+        $em->persist($a) ;
+        $em->flush();
+        return $this->redirectToRoute('getclass');
+        }
+        //return new Response('added');
+        return $this->render('classroom/lcl.html.twig', [
+            'formclassroom'=>$f->createView()
+            
+        ]);
+    }
+
+
+    #[Route('/updatec/{id}', name: 'updatec')]
+    public function updateStudent(ManagerRegistry $mr, Request $req , $id): Response
+    {
+        $a=$mr->getRepository(Classroom::class)->find($id);
+        
+        $f=$this->createForm(ClassroomType::class,$a);
+        $f->handleRequest($req);
+
+        if($f->isSubmitted()){
+
+            $ref=$mr->getRepository(Classroom::class)->find($a->getId());
+            dd($ref);
+            $name=$a->getName();
+            $a->setName($name);
+            if($ref==null){
+        $em=$mr->getManager();
+        $em->persist($a) ;
+        $em->flush();
+            }
+            else{
+                return new Response ('ref existe!');
+            }
+        return $this->redirectToRoute('getclass');
+        }
+        //return new Response('added');
+        return $this->render('classroom/lcl.html.twig', [
+            'formclassroom'=>$f->createView()
+            
+        ]);
     }
 }
